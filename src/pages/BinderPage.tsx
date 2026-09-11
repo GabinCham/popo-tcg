@@ -10,28 +10,51 @@ type BinderPageProps = {
   userId: string
 }
 
+const ALL_SEC_KEY = 'popo_show_all_sec'
+
+function isBaseSec(card: SecCard) {
+  return !card.parallel && !card.id.includes('_')
+}
+
 export function BinderPage({ email, userId }: BinderPageProps) {
   const [selectedCode, setSelectedCode] = useState(data.boosters[0]?.code ?? '')
   const [owned, setOwned] = useState<Set<string>>(new Set())
   const [active, setActive] = useState<SecCard | null>(null)
   const [saving, setSaving] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [showAllSec, setShowAllSec] = useState(() => {
+    try {
+      return localStorage.getItem(ALL_SEC_KEY) === '1'
+    } catch {
+      return false
+    }
+  })
 
   const selected = data.boosters.find((b) => b.code === selectedCode) ?? data.boosters[0]
+
+  const visibleCards = useMemo(
+    () => (showAllSec ? data.cards : data.cards.filter(isBaseSec)),
+    [showAllSec],
+  )
+
   const cards = useMemo(
-    () => data.cards.filter((c) => c.boosterCode === selected?.code),
-    [selected?.code],
+    () => visibleCards.filter((c) => c.boosterCode === selected?.code),
+    [visibleCards, selected?.code],
   )
 
   const ownedByBooster = useMemo(() => {
-    const map = new Map<string, number>()
-    for (const card of data.cards) {
-      if (owned.has(card.id)) {
-        map.set(card.boosterCode, (map.get(card.boosterCode) ?? 0) + 1)
-      }
+    const map = new Map<string, { got: number; total: number }>()
+    for (const card of visibleCards) {
+      const current = map.get(card.boosterCode) ?? { got: 0, total: 0 }
+      current.total += 1
+      if (owned.has(card.id)) current.got += 1
+      map.set(card.boosterCode, current)
     }
     return map
-  }, [owned])
+  }, [owned, visibleCards])
+
+  const totalOwned = visibleCards.filter((card) => owned.has(card.id)).length
+  const totalCards = visibleCards.length
 
   const storageKey = `popo_owned_sec:${userId}`
 
@@ -105,8 +128,12 @@ export function BinderPage({ email, userId }: BinderPageProps) {
     }
   }
 
-  const totalOwned = owned.size
-  const totalCards = data.cards.length
+  function toggleShowAllSec() {
+    const next = !showAllSec
+    setShowAllSec(next)
+    localStorage.setItem(ALL_SEC_KEY, next ? '1' : '0')
+    if (!next && active && !isBaseSec(active)) setActive(null)
+  }
 
   return (
     <div className="app-shell">
@@ -120,6 +147,13 @@ export function BinderPage({ email, userId }: BinderPageProps) {
             {totalOwned}/{totalCards}
           </p>
           <p className="muted email">{email}</p>
+          <button
+            type="button"
+            className={showAllSec ? 'ghost compact toggle-all on' : 'ghost compact toggle-all'}
+            onClick={toggleShowAllSec}
+          >
+            Toutes les SEC
+          </button>
           <button type="button" className="ghost compact" onClick={() => supabase.auth.signOut()}>
             Sortir
           </button>
@@ -140,13 +174,19 @@ export function BinderPage({ email, userId }: BinderPageProps) {
           <h2>Boosters</h2>
           <ul>
             {data.boosters.map((booster) => {
-              const got = ownedByBooster.get(booster.code) ?? 0
+              const stats = ownedByBooster.get(booster.code) ?? { got: 0, total: 0 }
               const activeBooster = booster.code === selected?.code
+              const fill =
+                stats.total > 0 && stats.got === stats.total
+                  ? 'complete'
+                  : stats.got >= 1
+                    ? 'partial'
+                    : ''
               return (
                 <li key={booster.code}>
                   <button
                     type="button"
-                    className={activeBooster ? 'booster-btn on' : 'booster-btn'}
+                    className={['booster-btn', activeBooster ? 'on' : '', fill].filter(Boolean).join(' ')}
                     onClick={(event) => {
                       setSelectedCode(booster.code)
                       event.currentTarget.scrollIntoView({
@@ -158,8 +198,8 @@ export function BinderPage({ email, userId }: BinderPageProps) {
                   >
                     <span className="code">{booster.code}</span>
                     <span className="booster-name">{booster.name.replace(/^Booster · |^Extra booster · |^Premium booster · /, '')}</span>
-                    <span className={got === booster.secCount && booster.secCount > 0 ? 'count done' : 'count'}>
-                      {got}/{booster.secCount}
+                    <span className={fill === 'complete' ? 'count done' : 'count'}>
+                      {stats.got}/{stats.total}
                     </span>
                   </button>
                 </li>
@@ -175,7 +215,7 @@ export function BinderPage({ email, userId }: BinderPageProps) {
               <h2>{selected?.name}</h2>
             </div>
             <p className="muted">
-              {(ownedByBooster.get(selected?.code ?? '') ?? 0)} / {cards.length} SEC
+              {(ownedByBooster.get(selected?.code ?? '')?.got ?? 0)} / {cards.length} SEC
             </p>
           </header>
 
