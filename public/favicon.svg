@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="PopoTCG">
+  <rect width="32" height="32" rx="8" fill="#0e1210"/>
+  <rect x="8.25" y="4.25" width="15.5" height="23.5" rx="2.4" fill="#171d19" stroke="#e2c078" stroke-width="1.5"/>
+  <path fill="#e2c078" d="M16 9.2l1.05 3.05 3.2.12-2.5 2.02.86 3.1L16 15.7l-2.61 1.79.86-3.1-2.5-2.02 3.2-.12z"/>
+  <rect x="11" y="22.2" width="10" height="1.4" rx="0.7" fill="#e2c078" opacity="0.55"/>
+</svg>
