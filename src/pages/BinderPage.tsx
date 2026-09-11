@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import catalog from '../data/catalog.json'
+import { assetUrl } from '../lib/assets'
 import { supabase } from '../lib/supabase'
 import type { Catalog, SecCard } from '../types'
 
@@ -232,7 +233,7 @@ export function BinderPage({ email, userId }: BinderPageProps) {
                       className={has ? 'card-tile owned' : 'card-tile'}
                       onClick={() => setActive(card)}
                     >
-                      <img src={card.imageUrl} alt={card.name} loading="lazy" referrerPolicy="no-referrer" />
+                      <img src={assetUrl(card.imageUrl)} alt={card.name} loading="lazy" referrerPolicy="no-referrer" />
                       <span className="card-meta">
                         <strong>{card.name}</strong>
                         <em>
@@ -258,7 +259,7 @@ export function BinderPage({ email, userId }: BinderPageProps) {
             aria-labelledby="card-title"
             onClick={(e) => e.stopPropagation()}
           >
-            <img src={active.imageUrl} alt={active.name} referrerPolicy="no-referrer" />
+            <img src={assetUrl(active.imageUrl)} alt={active.name} referrerPolicy="no-referrer" />
             <div className="modal-copy">
               <p className="eyebrow">{active.boosterCode}</p>
               <h3 id="card-title">{active.name}</h3>
