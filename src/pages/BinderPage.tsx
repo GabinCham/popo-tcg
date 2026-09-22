@@ -13,6 +13,32 @@ type BinderPageProps = {
 
 const ALL_SEC_KEY = 'popo_show_all_sec'
 
+const BOOSTER_ART: Record<string, string> = {
+  'OP-01': '/booster/OP01.webp',
+  'OP-02': '/booster/OP02.webp',
+  'OP-03': '/booster/OP03.webp',
+  'OP-04': '/booster/OP04.webp',
+  'OP-05': '/booster/OP05.webp',
+  'OP-06': '/booster/OP06.webp',
+  'OP-07': '/booster/OP07.webp',
+  'OP-08': '/booster/OP08.webp',
+  'OP-09': '/booster/OP09.webp',
+  'OP-10': '/booster/OP10.webp',
+  'OP-11': '/booster/OP11.webp',
+  'OP-12': '/booster/OP12.webp',
+  'OP-13': '/booster/OP13.webp',
+  'OP14-EB04': '/booster/OP14.webp',
+  'OP15-EB04': '/booster/OP15.webp',
+  'OP-16': '/booster/OP16.webp',
+  'OP-17': '/booster/OP17.webp',
+  'OP-18': '/booster/OP18.webp',
+  'EB-01': '/booster/EB01.webp',
+  'EB-02': '/booster/EB02.webp',
+  'EB-03': '/booster/EB03.webp',
+  'PRB-01': '/booster/PRB01.webp',
+  'PRB-02': '/booster/PRB02.webp',
+}
+
 function isBaseSec(card: SecCard) {
   return !card.parallel && !card.id.includes('_')
 }
@@ -53,6 +79,23 @@ export function BinderPage({ email, userId }: BinderPageProps) {
     }
     return map
   }, [owned, visibleCards])
+
+  // Les boosters terminés restent visibles, mais sont regroupés à la fin.
+  const sortedBoosters = useMemo(
+    () =>
+      data.boosters
+        .map((booster, index) => ({
+          booster,
+          index,
+          stats: ownedByBooster.get(booster.code) ?? { got: 0, total: 0 },
+        }))
+        .sort((a, b) => {
+          const aComplete = a.stats.total > 0 && a.stats.got === a.stats.total
+          const bComplete = b.stats.total > 0 && b.stats.got === b.stats.total
+          return Number(aComplete) - Number(bComplete) || a.index - b.index
+        }),
+    [ownedByBooster],
+  )
 
   const totalOwned = visibleCards.filter((card) => owned.has(card.id)).length
   const totalCards = visibleCards.length
@@ -174,9 +217,9 @@ export function BinderPage({ email, userId }: BinderPageProps) {
         <aside className="booster-list">
           <h2>Boosters</h2>
           <ul>
-            {data.boosters.map((booster) => {
-              const stats = ownedByBooster.get(booster.code) ?? { got: 0, total: 0 }
+            {sortedBoosters.map(({ booster, stats }) => {
               const activeBooster = booster.code === selected?.code
+              const boosterArt = BOOSTER_ART[booster.code]
               const fill =
                 stats.total > 0 && stats.got === stats.total
                   ? 'complete'
@@ -187,7 +230,15 @@ export function BinderPage({ email, userId }: BinderPageProps) {
                 <li key={booster.code}>
                   <button
                     type="button"
-                    className={['booster-btn', activeBooster ? 'on' : '', fill].filter(Boolean).join(' ')}
+                    className={[
+                      'booster-btn',
+                      boosterArt ? 'with-art' : '',
+                      boosterArt && !['OP-07', 'OP-10', 'OP-11'].includes(booster.code) ? 'zoomed-art' : '',
+                      activeBooster ? 'on' : '',
+                      fill,
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
                     onClick={(event) => {
                       setSelectedCode(booster.code)
                       event.currentTarget.scrollIntoView({
@@ -197,6 +248,7 @@ export function BinderPage({ email, userId }: BinderPageProps) {
                       })
                     }}
                   >
+                    {boosterArt ? <img className="booster-art" src={assetUrl(boosterArt)} alt="" aria-hidden="true" /> : null}
                     <span className="code">{booster.code}</span>
                     <span className="booster-name">{booster.name.replace(/^Booster · |^Extra booster · |^Premium booster · /, '')}</span>
                     <span className={fill === 'complete' ? 'count done' : 'count'}>
@@ -267,8 +319,22 @@ export function BinderPage({ email, userId }: BinderPageProps) {
                 {active.id}
                 {active.parallel ? ' · parallèle' : ''}
               </p>
-              <button type="button" disabled={saving} onClick={() => toggleOwned(active)}>
-                {owned.has(active.id) ? 'Je ne l’ai plus' : 'Je l’ai'}
+              <button
+                type="button"
+                className={owned.has(active.id) ? 'ownership-toggle is-owned' : 'ownership-toggle'}
+                disabled={saving}
+                aria-pressed={owned.has(active.id)}
+                onClick={() => toggleOwned(active)}
+              >
+                <span className="ownership-copy">
+                  <strong>{owned.has(active.id) ? 'Dans ma collection' : 'Ajouter à ma collection'}</strong>
+                  <small>{owned.has(active.id) ? 'Carte obtenue' : 'Marquer comme obtenue'}</small>
+                </span>
+                <span className="ownership-switch" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none">
+                    <path d="m3.2 8.2 3 3 6.6-6.6" />
+                  </svg>
+                </span>
               </button>
               <button type="button" className="ghost" onClick={() => setActive(null)}>
                 Fermer

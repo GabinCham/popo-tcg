@@ -7,7 +7,8 @@
   --gold: #e2c078;
   --line: rgba(226, 192, 120, 0.18);
   --owned: #1f6b48;
-  --owned-soft: rgba(46, 140, 92, 0.28);
+  --owned-soft: rgba(45, 178, 104, 0.4);
+  --card-radius: 0.45rem;
   --danger: #ff8d7a;
   --pad: max(1rem, env(safe-area-inset-left));
   --pad-r: max(1rem, env(safe-area-inset-right));
@@ -209,8 +210,8 @@ button.compact {
 .booster-list ul::-webkit-scrollbar { display: none; }
 
 .booster-btn {
-  width: max-content;
-  min-width: 5.6rem;
+  width: min(11rem, calc(100vw - var(--pad) - var(--pad-r)));
+  min-width: 0;
   flex: 0 0 auto;
   text-align: left;
   background: #141a16;
@@ -226,6 +227,31 @@ button.compact {
   min-height: var(--tap);
   scroll-snap-align: start;
 }
+.booster-btn.with-art {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.booster-art {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  filter: saturate(1.16) contrast(1.08);
+  transform: scale(1.14);
+}
+.booster-btn.zoomed-art .booster-art { transform: scale(2.2); }
+.booster-btn.with-art::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(10, 15, 12, 0.78) 0%, rgba(10, 15, 12, 0.42) 48%, rgba(10, 15, 12, 0.08) 100%);
+}
+.booster-btn.with-art > span { position: relative; z-index: 2; }
 .booster-btn .code { grid-column: 1; grid-row: 1; }
 .booster-btn .booster-name {
   grid-column: 1 / -1;
@@ -237,23 +263,23 @@ button.compact {
 }
 .booster-btn .count { grid-column: 2; grid-row: 1; }
 .booster-btn.on {
-  background: #243028;
+  background-color: rgba(36, 48, 40, 0.72);
   border-color: var(--gold);
 }
 .booster-btn.partial {
-  background: #3a3218;
-  border-color: #c9a24a;
+  background-color: rgba(20, 26, 22, 0.52);
+  border-color: var(--line);
 }
 .booster-btn.complete {
-  background: #1a4632;
+  background-color: rgba(26, 70, 50, 0.72);
   border-color: #4cbf7a;
 }
 .booster-btn.on.partial {
-  background: #4a3e1c;
+  background-color: rgba(36, 48, 40, 0.72);
   border-color: var(--gold);
 }
 .booster-btn.on.complete {
-  background: #226048;
+  background-color: rgba(34, 96, 72, 0.75);
   border-color: var(--gold);
 }
 .toggle-all.on {
@@ -310,7 +336,8 @@ button.compact {
   padding: 0;
   background: #121714;
   color: var(--ink);
-  border: 1px solid var(--line);
+  border: 2px solid var(--line);
+  border-radius: var(--card-radius);
   display: grid;
   overflow: hidden;
   text-align: left;
@@ -325,14 +352,27 @@ button.compact {
   background: #0a0d0b;
 }
 .card-tile.owned {
-  border-color: #4cbf7a;
-  box-shadow: inset 0 0 0 3px var(--owned-soft);
-  background: #163326;
+  border-color: transparent;
+  background:
+    linear-gradient(#1a5638, #1a5638) padding-box,
+    linear-gradient(135deg, #8af3b6 0%, #35c878 48%, #23975b 100%) border-box;
+  box-shadow:
+    0 0 0 1px rgba(102, 235, 157, 0.3),
+    0 9px 22px rgba(24, 155, 86, 0.2);
 }
 .card-tile.owned img {
-  filter: saturate(1.08);
-  box-shadow: inset 0 0 0 999px rgba(46, 140, 92, 0.18);
+  filter: saturate(1.14);
+  opacity: 0.88;
 }
+.card-tile.owned::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: rgba(21, 121, 70, 0.2);
+  pointer-events: none;
+}
+.card-tile.owned .card-meta { position: relative; z-index: 2; }
 .card-meta {
   display: grid;
   gap: 0.1rem;
@@ -341,11 +381,17 @@ button.compact {
 }
 .card-meta strong {
   font-size: 0.78rem;
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.card-meta em { color: var(--muted); font-style: normal; font-size: 0.66rem; }
+.card-meta em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.66rem;
+  text-align: center;
+}
 
 .modal-backdrop {
   position: fixed;
@@ -383,6 +429,58 @@ button.compact {
   gap: 0.45rem;
 }
 .modal-copy h3 { font-size: 1.2rem; }
+.ownership-toggle {
+  width: 100%;
+  min-height: 4.25rem;
+  padding: 0.65rem 0.7rem 0.65rem 0.9rem;
+  margin-top: 0.45rem;
+  border: 1px solid rgba(226, 192, 120, 0.3);
+  border-radius: var(--card-radius);
+  background: #111713;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  text-align: left;
+  letter-spacing: 0;
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+.ownership-toggle:hover { border-color: var(--gold); }
+.ownership-toggle.is-owned {
+  background: #17442d;
+  border-color: #42c979;
+  box-shadow: inset 0 0 0 1px rgba(66, 201, 121, 0.25);
+}
+.ownership-copy { display: grid; gap: 0.16rem; }
+.ownership-copy strong { font-size: 0.9rem; }
+.ownership-copy small { color: var(--muted); font-size: 0.72rem; font-weight: 500; }
+.is-owned .ownership-copy small { color: #b5e8c9; }
+.ownership-switch {
+  width: 2.75rem;
+  height: 1.55rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #4a514c;
+  padding: 0.17rem;
+  display: flex;
+  align-items: center;
+  transition: background 160ms ease;
+}
+.ownership-switch svg {
+  width: 1.21rem;
+  height: 1.21rem;
+  padding: 0.18rem;
+  border-radius: 50%;
+  background: #d9ddd7;
+  color: transparent;
+  transform: translateX(0);
+  transition: transform 160ms ease, background 160ms ease, color 160ms ease;
+}
+.ownership-switch path { stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+.is-owned .ownership-switch { background: #42c979; }
+.is-owned .ownership-switch svg { background: #f0fff5; color: #167243; transform: translateX(1.2rem); }
+.ownership-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 .empty { color: var(--muted); padding: 2rem 0; }
 
 @media (min-width: 720px) {
@@ -434,9 +532,9 @@ button.compact {
   }
   .booster-btn .count { grid-column: 3; grid-row: 1; }
   .booster-btn.on { background: #222a24; border-color: var(--line); }
-  .booster-btn.partial { background: #3a3218; border-color: #c9a24a; }
+  .booster-btn.partial { background: transparent; border-color: transparent; }
   .booster-btn.complete { background: #1a4632; border-color: #4cbf7a; }
-  .booster-btn.on.partial { background: #4a3e1c; border-color: var(--gold); }
+  .booster-btn.on.partial { background: #222a24; border-color: var(--line); }
   .booster-btn.on.complete { background: #226048; border-color: var(--gold); }
   .card-pane { padding: 1.1rem 1.3rem 2.4rem; }
   .pane-head h2 { font-size: 1.35rem; }

@@ -153,6 +153,13 @@
       "packId": "569302",
       "sortOrder": 21,
       "secCount": 9
+    },
+    {
+      "code": "OP-18",
+      "name": "Booster · THE DOMINANCE OF GOD",
+      "packId": "569118",
+      "sortOrder": 22,
+      "secCount": 2
     }
   ],
   "cards": [
@@ -1044,6 +1051,20 @@
       "name": "Trafalgar Law",
       "imageUrl": "/cards/OP10-119_r1.png",
       "parallel": true
+    },
+    {
+      "id": "OP18-119",
+      "boosterCode": "OP-18",
+      "name": "Saint Shamrock",
+      "imageUrl": "https://api.lumatcg.com/storage/v1/object/public/blog-images/a6e49e15-ba04-4265-8117-3c0d28379a9a.webp",
+      "parallel": false
+    },
+    {
+      "id": "OP18-LOKI",
+      "boosterCode": "OP-18",
+      "name": "Loki",
+      "imageUrl": "https://api.lumatcg.com/storage/v1/object/public/blog-images/a6f061d5-1f3c-4033-945e-5314973743c8.webp",
+      "parallel": false
     }
   ]
 }
