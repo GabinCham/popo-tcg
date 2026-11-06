@@ -120,46 +120,53 @@
       "secCount": 6
     },
     {
+      "code": "OP-18",
+      "name": "Booster · THE DOMINANCE OF GOD",
+      "packId": "569118",
+      "sortOrder": 17,
+      "secCount": 2
+    },
+    {
       "code": "EB-01",
       "name": "Extra booster · MEMORIAL COLLECTION",
       "packId": "569201",
-      "sortOrder": 17,
+      "sortOrder": 18,
       "secCount": 2
     },
     {
       "code": "EB-02",
       "name": "Extra booster · Anime 25th Collection",
       "packId": "569202",
-      "sortOrder": 18,
+      "sortOrder": 19,
       "secCount": 3
     },
     {
       "code": "EB-03",
       "name": "Extra booster · ONE PIECE HEROINES EDITION",
       "packId": "569203",
-      "sortOrder": 19,
+      "sortOrder": 20,
       "secCount": 5
+    },
+    {
+      "code": "EB-05",
+      "name": "Extra booster · ONE PIECE HEROINES EDITION vol.2",
+      "packId": "569205",
+      "sortOrder": 21,
+      "secCount": 2
     },
     {
       "code": "PRB-01",
       "name": "Premium booster · ONE PIECE CARD THE BEST",
       "packId": "569301",
-      "sortOrder": 20,
+      "sortOrder": 22,
       "secCount": 16
     },
     {
       "code": "PRB-02",
       "name": "Premium booster · ONE PIECE CARD THE BEST VOL.2",
       "packId": "569302",
-      "sortOrder": 21,
+      "sortOrder": 23,
       "secCount": 9
-    },
-    {
-      "code": "OP-18",
-      "name": "Booster · THE DOMINANCE OF GOD",
-      "packId": "569118",
-      "sortOrder": 22,
-      "secCount": 2
     }
   ],
   "cards": [
@@ -1056,15 +1063,29 @@
       "id": "OP18-119",
       "boosterCode": "OP-18",
       "name": "Saint Shamrock",
-      "imageUrl": "https://api.lumatcg.com/storage/v1/object/public/blog-images/a6e49e15-ba04-4265-8117-3c0d28379a9a.webp",
+      "imageUrl": "/cards/OP18-119.png",
       "parallel": false
     },
     {
       "id": "OP18-LOKI",
       "boosterCode": "OP-18",
       "name": "Loki",
-      "imageUrl": "https://api.lumatcg.com/storage/v1/object/public/blog-images/a6f061d5-1f3c-4033-945e-5314973743c8.webp",
+      "imageUrl": "/cards/OP18-LOKI.png",
       "parallel": false
+    },
+    {
+      "id": "EB05-061",
+      "boosterCode": "EB-05",
+      "name": "Nami",
+      "imageUrl": "/cards/EB05-061.png",
+      "parallel": false
+    },
+    {
+      "id": "EB05-061_p1",
+      "boosterCode": "EB-05",
+      "name": "Nami",
+      "imageUrl": "/cards/EB05-061_p1.png",
+      "parallel": true
     }
   ]
 }

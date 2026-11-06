@@ -35,6 +35,7 @@ const BOOSTER_ART: Record<string, string> = {
   'EB-01': '/booster/EB01.webp',
   'EB-02': '/booster/EB02.webp',
   'EB-03': '/booster/EB03.webp',
+  'EB-05': '/booster/EB05.webp',
   'PRB-01': '/booster/PRB01.webp',
   'PRB-02': '/booster/PRB02.webp',
 }
@@ -80,22 +81,10 @@ export function BinderPage({ email, userId }: BinderPageProps) {
     return map
   }, [owned, visibleCards])
 
-  // Les boosters terminés restent visibles, mais sont regroupés à la fin.
-  const sortedBoosters = useMemo(
-    () =>
-      data.boosters
-        .map((booster, index) => ({
-          booster,
-          index,
-          stats: ownedByBooster.get(booster.code) ?? { got: 0, total: 0 },
-        }))
-        .sort((a, b) => {
-          const aComplete = a.stats.total > 0 && a.stats.got === a.stats.total
-          const bComplete = b.stats.total > 0 && b.stats.got === b.stats.total
-          return Number(aComplete) - Number(bComplete) || a.index - b.index
-        }),
-    [ownedByBooster],
-  )
+  const boosters = data.boosters.map((booster) => ({
+    booster,
+    stats: ownedByBooster.get(booster.code) ?? { got: 0, total: 0 },
+  }))
 
   const totalOwned = visibleCards.filter((card) => owned.has(card.id)).length
   const totalCards = visibleCards.length
@@ -217,7 +206,7 @@ export function BinderPage({ email, userId }: BinderPageProps) {
         <aside className="booster-list">
           <h2>Boosters</h2>
           <ul>
-            {sortedBoosters.map(({ booster, stats }) => {
+            {boosters.map(({ booster, stats }) => {
               const activeBooster = booster.code === selected?.code
               const boosterArt = BOOSTER_ART[booster.code]
               const fill =
